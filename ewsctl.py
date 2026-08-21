@@ -176,6 +176,21 @@ def cmd_folders_rm(account, args):
     print(f"deleted folder '{args.name}'")
 
 
+def cmd_contacts(account, args):
+    """GAL + personal contacts lookup via EWS ResolveNames (Outlook's
+    "Check Names"). Prints address<TAB>name — the aerc address-book
+    format."""
+    _ = account.version  # protocol services need a negotiated version
+    try:
+        results = account.protocol.resolve_names([args.term])
+    except Exception:  # ErrorNameResolutionNoResults and friends
+        return
+    for m in results:
+        addr = getattr(m, "email_address", None)
+        if addr:
+            print(f"{addr}\t{m.name or ''}")
+
+
 def cmd_toggle(account, args, enabled):
     r = find_rule(account, args.name)
     r.is_enabled = enabled
@@ -236,8 +251,15 @@ def main():
     fr = fsub.add_parser("rm", help="delete an empty folder")
     fr.add_argument("name")
 
+    contacts = sub.add_parser("contacts", help="GAL lookup (address<TAB>name)")
+    contacts.add_argument("term")
+
     args = p.parse_args()
     account = load_account(args.account)
+
+    if args.cmd == "contacts":
+        cmd_contacts(account, args)
+        return
 
     if args.cmd == "folders":
         match args.fcmd:
