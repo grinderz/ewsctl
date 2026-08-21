@@ -20,6 +20,7 @@ from pathlib import Path
 from typing import NoReturn
 
 from exchangelib import DELEGATE, NTLM, Account, Configuration, Credentials
+from exchangelib.folders import Folder
 from exchangelib.properties import Actions, Conditions, Rule
 
 CONFIG = Path.home() / ".config/ewsctl/config.toml"
@@ -153,6 +154,28 @@ def cmd_rm(account, args):
     print(f"deleted rule '{args.name}'")
 
 
+def cmd_folders_list(account, args):
+    root = account.msg_folder_root
+    for f in sorted(root.walk(), key=lambda f: f.absolute):
+        print(f.absolute.removeprefix(root.absolute + "/"))
+
+
+def cmd_folders_add(account, args):
+    parent = (
+        find_folder(account, args.parent) if args.parent else account.msg_folder_root
+    )
+    Folder(parent=parent, name=args.name).save()
+    print(f"created folder '{args.name}' under '{parent.name}'")
+
+
+def cmd_folders_rm(account, args):
+    f = find_folder(account, args.name)
+    if f.total_count:
+        die(f"folder '{args.name}' still holds {f.total_count} items; empty it first")
+    f.delete()
+    print(f"deleted folder '{args.name}'")
+
+
 def cmd_toggle(account, args, enabled):
     r = find_rule(account, args.name)
     r.is_enabled = enabled
@@ -204,8 +227,27 @@ def main():
     rd = rsub.add_parser("disable", help="disable a rule")
     rd.add_argument("name")
 
+    folders = sub.add_parser("folders", help="mailbox folders")
+    fsub = folders.add_subparsers(dest="fcmd", required=True)
+    fsub.add_parser("list", help="list folders")
+    fa = fsub.add_parser("add", help="create a folder")
+    fa.add_argument("name")
+    fa.add_argument("--parent", help="parent folder name (default: mailbox root)")
+    fr = fsub.add_parser("rm", help="delete an empty folder")
+    fr.add_argument("name")
+
     args = p.parse_args()
     account = load_account(args.account)
+
+    if args.cmd == "folders":
+        match args.fcmd:
+            case "list":
+                cmd_folders_list(account, args)
+            case "add":
+                cmd_folders_add(account, args)
+            case "rm":
+                cmd_folders_rm(account, args)
+        return
 
     match args.rcmd:
         case "list":
