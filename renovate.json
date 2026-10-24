@@ -1,0 +1,43 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": [
+    "Renovate on GitHub keeps uv.lock: exchangelib inside its pyproject range, and a weekly lock refresh for ruff and mypy, which pyproject leaves unpinned.",
+    "requires-python moves by hand."
+  ],
+  "extends": [
+    "config:recommended"
+  ],
+  "timezone": "Europe/Istanbul",
+  "schedule": [
+    "before 9am on saturday"
+  ],
+  "dependencyDashboard": true,
+  "prConcurrentLimit": 5,
+  "semanticCommitType": "chore",
+  "baseBranchPatterns": [
+    "master"
+  ],
+  "enabledManagers": [
+    "pep621"
+  ],
+  "branchPrefix": "renovate/",
+  "labels": [
+    "dependencies"
+  ],
+  "rangeStrategy": "update-lockfile",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": [
+      "before 9am on saturday"
+    ]
+  },
+  "packageRules": [
+    {
+      "description": "requires-python is bumped by hand",
+      "matchDepTypes": [
+        "requires-python"
+      ],
+      "enabled": false
+    }
+  ]
+}
