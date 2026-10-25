@@ -35,3 +35,10 @@ ewsctl rules disable "some rule"
 
 Auth is NTLM (what on-prem Exchange usually insists on). Requires the
 CalDAV/EWS endpoint to be reachable directly — no davmail in between.
+
+## Development
+
+`make lint` runs ruff, mypy and the pre-commit hooks (gitleaks among them);
+`make fmt` formats and autofixes. The GitHub workflow runs `make lint` on every
+push and pull request. Renovate keeps `uv.lock` fresh and bumps the actions and
+hook revisions on the saturday window.

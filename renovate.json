@@ -18,8 +18,13 @@
     "master"
   ],
   "enabledManagers": [
-    "pep621"
+    "pep621",
+    "github-actions",
+    "pre-commit"
   ],
+  "pre-commit": {
+    "enabled": true
+  },
   "branchPrefix": "renovate/",
   "labels": [
     "dependencies"
@@ -32,6 +37,13 @@
     ]
   },
   "packageRules": [
+    {
+      "description": "chore for every update: config:recommended prefixes runtime deps with fix otherwise",
+      "matchPackageNames": [
+        "*"
+      ],
+      "semanticCommitType": "chore"
+    },
     {
       "description": "requires-python is bumped by hand",
       "matchDepTypes": [

@@ -1,0 +1,41 @@
+# Run: make lint.pre-commit (make lint adds ruff and mypy)
+exclude: '^\.git/'
+fail_fast: true
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+      - id: check-merge-conflict
+      - id: check-executables-have-shebangs
+      - id: check-shebang-scripts-are-executable
+      - id: check-symlinks
+      - id: mixed-line-ending
+        args: ['--fix=no']
+      - id: end-of-file-fixer
+      - id: fix-byte-order-marker
+      - id: trailing-whitespace
+        args: ['--markdown-linebreak-ext=md']
+      - id: forbid-new-submodules
+
+  # secrets: the Exchange password comes from password_cmd at run time, a
+  # pasted one must never reach the history of a public repo
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.30.1
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/rhysd/actionlint
+    rev: v1.7.12
+    hooks:
+      - id: actionlint
+
+  # a broken renovate.json silently stops the PRs
+  - repo: https://github.com/renovatebot/pre-commit-hooks
+    rev: 44.181.5
+    hooks:
+      - id: renovate-config-validator
